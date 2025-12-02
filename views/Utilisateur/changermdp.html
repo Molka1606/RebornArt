@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Changer le mot de passe</title>
+  <link rel="stylesheet" href="../assets/css/signup.css">
+  <link href="../../controller/adminController.php">
+  <script src="js/user.js"></script>
+</head>
+<body>
+
+<div class="box">
+  <div class="form-box">
+    <form method="POST" action="">
+      <h1>Changer le mot de passe</h1>
+
+      <input type="password" placeholder="Ancien mot de passe" name="ancien" required>
+      <input type="password" placeholder="Nouveau mot de passe" name="nouveau" required>
+      <input type="password" placeholder="Confirmer le mot de passe" name="confirmer" required>
+
+      <div class="actions">
+        <button type="submit" class="btn-main">Enregistrer</button>
+        <button type="reset" class="btn-simple">Annuler</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="side-box">
+    <div class="side">
+      <button><a href="info.html">Informations</a></button>
+      <button type="submit" onclick="return validerChangementMdp()"><a href="changermdp.html" >Changer le mot de passe</a></button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
