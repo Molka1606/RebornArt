@@ -2,7 +2,7 @@
 require __DIR__. "../../model/config.php";
 require __DIR__. "../../model/Utilisateur.php";
 
-class userController {
+class adminController {
 
     function getAllUser(){
         $sql="SELECT * FROM User";
@@ -39,29 +39,40 @@ class userController {
     }
 
 
-    function login($email, $motdepasse){
-        $sql = "SELECT * FROM User WHERE email = :email";
-        $db = config::getConnexion();
-        try {
-            $query = $db->prepare($sql);
-            $query->bindValue(':email', $email);
-            $query->execute();
-            $user = $query->fetch(PDO::FETCH_ASSOC);
+function login($email, $motdepasse){
+    $sql = "SELECT * FROM User WHERE email = :email";
+    $db = config::getConnexion();
 
-            if($user && password_verify($motdepasse, $user['motdepasse'])) {
-                return $user;
-            } else {
-                return false;
+    try {
+        $query = $db->prepare($sql);
+        $query->bindValue(':email', $email);
+        $query->execute();
+        $user = $query->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+
+            if ($user['status'] === 'inactive') {
+                return "inactive";
             }
-        } catch(Exception $e) {
-            echo "Erreur : ".$e->getMessage();
-            return false;
-        }
-    }
 
-public function updateProfile($id, $nom, $prenom, $email, $currentPassword, $newPassword = null) {
+            if (password_verify($motdepasse, $user['motdepasse'])) {
+                return $user;
+            }
+        }
+
+        return false;
+
+    } catch(Exception $e) {
+        echo "Erreur : ".$e->getMessage();
+        return false;
+    }
+}
+
+
+public function updateProfile($id, $nom, $prenom, $email, $currentPassword, $newPassword = null, $photo = null) {
     $db = config::getConnexion();
     
+    // Récupérer l'utilisateur actuel
     $sql = "SELECT * FROM User WHERE id = :id";
     $stmt = $db->prepare($sql);
     $stmt->execute([':id' => $id]);
@@ -71,30 +82,46 @@ public function updateProfile($id, $nom, $prenom, $email, $currentPassword, $new
         return false; 
     }
 
+    // Si aucune nouvelle photo n'est envoyée → garder l'ancienne de la BDD
+    if ($photo === null) {
+        $photoToSave = isset($user['photo']) ? $user['photo'] : null;
+    } else {
+        $photoToSave = $photo;
+    }
+
+    // Avec changement de mot de passe
     if ($newPassword && !empty($newPassword)) {
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-        $sql = "UPDATE User SET nom=:nom, prenom=:prenom, email=:email, motdepasse=:motdepasse WHERE id=:id";
+        $sql = "UPDATE User 
+                SET nom = :nom, prenom = :prenom, email = :email, motdepasse = :motdepasse, photo = :photo 
+                WHERE id = :id";
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':nom' => $nom,
             ':prenom' => $prenom,
             ':email' => $email,
             ':motdepasse' => $hashedPassword,
+            ':photo' => $photoToSave,
             ':id' => $id
         ]);
     } else {
-        $sql = "UPDATE User SET nom=:nom, prenom=:prenom, email=:email WHERE id=:id";
+        // Sans changement de mot de passe
+        $sql = "UPDATE User 
+                SET nom = :nom, prenom = :prenom, email = :email, photo = :photo
+                WHERE id = :id";
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':nom' => $nom,
             ':prenom' => $prenom,
             ':email' => $email,
+            ':photo' => $photoToSave,
             ':id' => $id
         ]);
     }
 
     return true;
 }
+
 
 public function getUserById($id){
     $db = config::getConnexion();
@@ -127,6 +154,55 @@ public function deleteUser($id){
     catch(Exception $e){
         echo "Erreur : ".$e->getMessage();
     }
+}
+
+public function desactiverAdmin($id) {
+    $db = config::getConnexion();
+    $sql = "UPDATE User SET status = 'inactive' WHERE id = :id";
+    $stmt = $db->prepare($sql);
+    return $stmt->execute([':id' => $id]);
+}
+
+public function createAdminResetCode($email) {
+    $db = config::getConnexion();
+
+    $stmt = $db->prepare("SELECT * FROM User WHERE email = :email AND role = 'admin'");
+    $stmt->execute([':email' => $email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) return false;
+
+    $code = rand(100000, 999999);
+
+    $update = $db->prepare("UPDATE User SET reset_code = :code WHERE email = :email");
+    $update->execute([
+        ':code' => $code,
+        ':email' => $email
+    ]);
+
+    return $code;
+}
+
+public function checkAdminResetCode($code) {
+    $db = config::getConnexion();
+
+    $stmt = $db->prepare("SELECT * FROM User WHERE reset_code = :code AND role = 'admin'");
+    $stmt->execute([':code' => $code]);
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function updateAdminPasswordFromCode($code, $newPassword) {
+    $db = config::getConnexion();
+
+    $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $stmt = $db->prepare("UPDATE User SET motdepasse = :mdp, reset_code = NULL 
+                         WHERE reset_code = :code AND role='admin'");
+    return $stmt->execute([
+        ':mdp' => $hashed,
+        ':code' => $code
+    ]);
 }
 
 }

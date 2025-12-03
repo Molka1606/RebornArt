@@ -1,34 +1,48 @@
-<?php
+ <?php
 
 require_once __DIR__ . '/../../controller/adminController.php';
 
 // Instantiate the controller
-$userC = new userController();
+$userC = new adminController();
+
 
 $loginError = '';
+$emailError = '';
+$passwordError = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['email']) && isset($_POST['motdepasse'])) {
-        $email = $_POST['email'];
-        $motdepasse = $_POST['motdepasse'];
 
-        if (!empty($email) && !empty($motdepasse)) {
-            $user = $userC->login($email, $motdepasse);
+    $email = $_POST['email'] ?? '';
+    $motdepasse = $_POST['motdepasse'] ?? '';
 
-            if ($user) {
-                if ($user['role'] === 'admin') {
-                    session_start();
-                    $_SESSION['user'] = $user;
-                    header("Location: ../../../index.php"); 
-                    exit();
-                } else {
-                    $loginError = "Vous n'étes pas autorisé à accéder à cette page.";
-                }
+    // Vérifier champs vides
+    if (empty($email)) {
+        $emailError = "Veuillez entrer votre adresse e-mail.";
+    }
+
+    if (empty($motdepasse)) {
+        $passwordError = "Veuillez entrer votre mot de passe.";
+    }
+
+    // Si aucune erreur → procéder au login
+    if (!$emailError && !$passwordError) {
+
+        $user = $userC->login($email, $motdepasse);
+        if ($user === "inactive") {
+            $passwordError = "Votre compte admin est désactivé.";
+        }
+
+        if ($user) {
+            if ($user['role'] === 'admin') {
+                session_start();
+                $_SESSION['user'] = $user;
+                header("Location: ../index.php");
+                exit();
             } else {
-                $loginError = "Email ou mot de passe incorrect.";
+                $passwordError = "Vous n'êtes pas autorisé à accéder à cette page.";
             }
         } else {
-            $loginError = "Veuillez remplir tous les champs.";
+            $passwordError = "Email ou mot de passe incorrect.";
         }
     }
 }
@@ -46,22 +60,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="body-profil">
     <div class="box">
         <div class="form-box">
-            <form method="post" action="../index.php">
+
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                 <h1 class="htitre">Connexion Administrateur</h1>
 
-                <?php if($loginError): ?>
-                    <p style="color:red;"><?php echo $loginError; ?></p>
-                <?php endif; ?>
+                <!-- Email -->
+                <input type="email" id="email" name="email" placeholder="Adresse e-mail"
+                       value="<?php echo htmlspecialchars($email ?? ''); ?>">
 
-                <input type="email" id="email" name="email" placeholder="Adresse e-mail" 
-                       value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>">
+                <span style="color:red; font-size:14px;">
+                    <?php echo $emailError; ?>
+                </span>
+
+                <!-- Mot de passe -->
                 <input type="password" id="motdepasse" name="motdepasse" placeholder="Mot de passe">
+
+                <span style="color:red; font-size:14px;">
+                    <?php echo $passwordError; ?>
+                </span>
+                <a href="adminForgetPassword.php">Mot de passe oublié ?</a>
+
                 <button type="submit">Se connecter</button>
             </form>
+
         </div>
         <div class="side-box">
-            <div class="side">
-            </div>
+            <div class="side"></div>
         </div>
     </div>
 </body>

@@ -34,14 +34,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si pas de session active, on tente la connexion
     $user = $controller->login($email, $motdepasse);
+    // 🔴 Si le compte est désactivé
+    if ($user === "inactive") {
+        echo "<script>
+            alert('Votre compte est désactivé.');
+            window.location.href='signIn.html';
+        </script>";
+        exit;
+}
 
     if ($user) {
         $_SESSION['user'] = [
             'id' => $user['id'],
             'nom' => $user['nom'],
             'prenom' => $user['prenom'],
-            'email' => $user['email']
+            'email' => $user['email'],
+            'photo' => $user['photo'],   // ⭐ OBLIGATOIRE !
+            'role' => $user['role']
         ];
+
 
         echo "<script>
             localStorage.setItem('user', JSON.stringify(".json_encode($_SESSION['user'])."));

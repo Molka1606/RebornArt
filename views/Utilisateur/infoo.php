@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 if(!isset($_SESSION['user'])){
@@ -24,7 +25,6 @@ if (isset($_SESSION['user'])) {
 }
 ?>
 <style>
-/* --- Ton CSS existant --- */
 #userMenu > a { display:inline-block; background-color:#28a745; color:white !important; padding:6px 12px; border-radius:6px; font-size:14px; font-weight:4500; text-decoration:none; transition:0.2s ease-in-out; }
 #userMenu > a:hover { background-color:#218838; }
 #userMenu .listee li { width:100%; }
@@ -50,6 +50,7 @@ if (isset($_SESSION['user'])) {
 <link rel="stylesheet" href="../assets/css/signup.css">
 </head>
 <body>
+
 <header class="header-area header-sticky wow slideInDown" data-wow-duration="0.75s" data-wow-delay="0s">
 <div class="container"><div class="row"><div class="col-12">
 <nav class="main-nav">
@@ -68,25 +69,38 @@ if (isset($_SESSION['user'])) {
 <div class="profile-container">
 
     <div class="left-card">
-        <img src="<?php echo isset($user['photo']) ? $user['photo'] : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; ?>" alt="photo" style="width:150px; height:150px; border-radius:50%; object-fit:cover;">
+        <img src="<?php echo isset($user['photo']) && $user['photo'] != '' ? $user['photo'] : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; ?>" 
+             alt="photo" 
+             style="width:150px; height:150px; border-radius:50%; object-fit:cover;">
+
         <h4>Mon Profil</h4>
         <br>
+
+        <!-- ✔️ INPUT IMAGE UNIQUE -->
         <label class="btn-main" style="cursor:pointer;">
             Choisir une photo
-            <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display:none;">
+            <input type="file" id="profileImage" name="profileImage" form="updateForm" accept="image/*" style="display:none;">
         </label>
 
         <form method="GET" action="deleteuser.php" onsubmit="return confirm('Voulez-vous vraiment supprimer votre compte ?');">
             <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
             <button type="submit" class="btn-main">Supprimer</button>
         </form>
+            <form method="POST" action="desactiver_compte.php"
+        onsubmit="return confirm('Voulez-vous vraiment désactiver votre compte ?');">
+        <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+        <button type="submit" class="btn-main" style="background-color:#c82333; margin-top:10px;">
+            Désactiver mon compte
+        </button>
+    </form>
+
     </div>
 
     <div class="right-card">
         <h2>Profil</h2>
 
-        <form method="POST" action="updateUser.php" enctype="multipart/form-data">
-          <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display:none;">
+        <!-- ✔️ FORMULAIRE DU PROFIL AVEC ID POUR L’INPUT -->
+        <form method="POST" action="updateUser.php" enctype="multipart/form-data" id="updateForm">
             <div class="row">
                 <div class="col-md-6">
                     <label>Nom</label>
@@ -133,7 +147,7 @@ if (isset($_SESSION['user'])) {
 <script src="../assets/js/templatemo-custom.js"></script>
 
 <script>
-    // Affichage instantané de l'image
+    // ✔️ Aperçu instantané
     var profileImageInput = document.getElementById('profileImage');
     var profilePreview = document.querySelector('.left-card img');
 
@@ -148,5 +162,6 @@ if (isset($_SESSION['user'])) {
         }
     });
 </script>
+
 </body>
 </html>

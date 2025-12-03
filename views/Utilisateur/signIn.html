@@ -14,12 +14,19 @@
   <div class="box">
     <div class="form-box">
       <form method="POST" action="login.php"> 
-        <h1 class="htitre">Se connecter</h1>
-        <input type="email" name="email" placeholder="Email">
-        <input type="password" name="motdepasse" placeholder="Mot de passe">
-        <a href="forgetPassword.html">Mot de passe oublié ?</a>
-        <button type="submit" onclick="return validerConnexion()">Connexion</button>
-      </form>
+    <h1 class="htitre">Se connecter</h1>
+
+    <input type="email" id="emailIn" name="email" placeholder="Email">
+    <span id="emailErrorIn" class="error"></span>
+
+    <input type="password" id="motdepasseIn" name="motdepasse" placeholder="Mot de passe">
+    <span id="mdpErrorIn" class="error"></span>
+
+    <a href="forgetPassword.php">Mot de passe oublié ?</a>
+
+    <button type="submit" onclick="return validerConnexion()">Connexion</button>
+</form>
+
     </div>
     <div class="side-box">
       <button type="submit"><a href="signUp.html">Créer un compte</a></button>
@@ -27,6 +34,6 @@
   </div>
 
 
-  
+
 </body>
 </html>

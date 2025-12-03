@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../../Controller/adminController.php';
+
+require_once __DIR__ . '/../../controller/adminController.php';  // ✔️ chemin corrigé
 
 if (!isset($_SESSION['user'])) {
     header("Location: ../../views/index.php");
@@ -13,14 +14,15 @@ $success = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
     $nom = $_POST['nom'];
     $prenom = $_POST['prenom'];
     $email = $_POST['email'];
     $password = $_POST['password']; 
     $newpassword = $_POST['newpassword'];
 
-    $adminC = new userController();
-    $result = $adminC->updateProfile($user['id'], $nom, $prenom, $email, $password, $newpassword);
+    $userC = new adminController();
+    $result = $userC->updateProfile($user['id'], $nom, $prenom, $email, $password, $newpassword);
 
     if ($result) {
         $_SESSION['user']['nom'] = $nom;
@@ -71,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item">
-            <a class="nav-link" href="../../../index.php">
+            <a class="nav-link" href="../index.php">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
@@ -390,6 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <form action="" method="POST">
 
+
                             <div class="form-group">
                                 <label for="nom">Nom :</label>
                                 <input type="text" id="nom" name="nom" class="form-control" value="<?php echo htmlspecialchars($user['nom']); ?>" readonly>
@@ -424,6 +427,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="hidden" name="id" value="<?= $user['id'] ?>">
                             <button type="submit" class="btn btn-danger mt-3">Supprimer mon compte</button>
                         </form>
+                        <form method="POST" action="desactiver_admin.php"
+                            onsubmit="return confirm('Voulez-vous vraiment désactiver votre compte ?');">
+                            <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                            <button type="submit" class="btn btn-warning mt-3">Désactiver mon compte </button>
+                        </form>
+
+
 
 
                     </div>

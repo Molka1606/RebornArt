@@ -1,9 +1,9 @@
 <?php
 session_start(); 
 
-require __DIR__ . '/../../model/config.php'; 
+require_once __DIR__ . '/../../model/config.php';  // ✔️ AJOUT ESSENTIEL
 
-$connectedUser = isset($_SESSION['user']) ? $_SESSION['user'] : ['nom' => 'InvitÃ©', 'prenom' => ''];
+$connectedUser = isset($_SESSION['user']) ? $_SESSION['user'] : ['nom' => 'Invité', 'prenom' => ''];
 
 // -------------------- AJOUT DE LA SUPPRESSION --------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
@@ -12,13 +12,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user_id'])) {
         $db = config::getConnexion();
         $stmtDelete = $db->prepare("DELETE FROM User WHERE id = :id");
         $stmtDelete->execute(['id' => $deleteId]);
-        // Redirection pour Ã©viter la resoumission du formulaire
+
         header("Location: ".$_SERVER['PHP_SELF']);
         exit();
     } catch (Exception $e) {
         echo "Erreur lors de la suppression : " . $e->getMessage();
     }
 }
+
 // -------------------------------------------------------------------
 
 try {
@@ -178,18 +179,17 @@ try {
                 </div>
             </li>
 
-            <!-- Nav Item - Charts -->
             <li class="nav-item">
-                <a class="nav-link" href="charts.html">
+                <a class="nav-link" href="../admin/profiladmin.php">
                     <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Paiement</span></a>
+                    <span>Profil</span></a>
             </li>
 
             <!-- Nav Item - Tables -->
             <li class="nav-item">
-                <a class="nav-link" href="tables.html">
+                <a class="nav-link"  href="../admin/logout.php">
                     <i class="fas fa-fw fa-table"></i>
-                    <span>Statics</span></a>
+                    <span>Déconnecter</span></a>
             </li>
 
             <!-- Divider -->

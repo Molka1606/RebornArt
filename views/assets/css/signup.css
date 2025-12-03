@@ -555,3 +555,7 @@ input:focus {
     cursor: pointer;
     font-weight: 500;
 }
+.error {
+    color: red;
+    font-size: 14px;
+}
