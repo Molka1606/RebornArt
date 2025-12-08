@@ -2,15 +2,14 @@
 session_start();
 require_once __DIR__ . '/../../controller/adminController.php';
 
-$userC = new adminController();
+// ✅ Instancier le controller
+$adminC = new adminController();
 
-// Bloquer si un autre rôle est connecté
-if (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
+// Si quelqu'un est déjà connecté et ce n'est pas un admin → bloquer
+if (isset($_SESSION['user']) && $_SESSION['user']['role'] !== 'admin') {
     echo "<script>
         alert('Un utilisateur est déjà connecté sur ce navigateur. Déconnectez-le d’abord.');
-        window.location.href='../../Utilisateur/indexx.php';
     </script>";
-    exit;
 }
 
 $loginError = '';
@@ -31,19 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!$emailError && !$passwordError) {
-        $user = $userC->login($email, $motdepasse);
-
-        // 🔍 Debug (à utiliser si ça bloque encore)
-        // var_dump($user); die();
+        $user = $adminC->login($email, $motdepasse);
 
         if ($user === "inactive") {
             $passwordError = "Votre compte admin est désactivé.";
         } elseif (is_array($user) && $user['role'] === 'admin') {
+
             // Connexion réussie
             $_SESSION['user'] = $user;
             $_SESSION['role'] = 'admin';
             header("Location: ../index.php");
             exit();
+
         } elseif (is_array($user)) {
             $passwordError = "Vous n'êtes pas autorisé à accéder à cette page.";
         } else {
