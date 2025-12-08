@@ -14,7 +14,7 @@ if (!isset($_POST['id'])) {
 
 $id = $_POST['id'];
 
-$adminC = new userController();
+$adminC = new adminController();
 
 // Désactiver l'admin
 $adminC->desactiverAdmin($id);

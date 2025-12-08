@@ -70,13 +70,17 @@ function validerInscription() {
     }
 
     // Mot de passe
-    var regexMdp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
-    if (mdp == "") {
+    var regexMdp  = /^[A-Za-z0-9]{4,}$/; // Minimum 6 caractères, lettres + chiffres
+
+    if (mdp === "") {
         document.getElementById("mdpError").innerText = "Veuillez saisir un mot de passe.";
         valide = false;
-    } else if (!regexMdp.test(mdp)) {
-        document.getElementById("mdpError").innerText = "Le mot de passe doit contenir au moins 6 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.";
+    } 
+    else if (!regexMdp.test(mdp)) {
+        document.getElementById("mdpError").innerText = "Le mot de passe doit contenir au moins 6 caractères (lettres et chiffres).";
         valide = false;
+    
+
     }
 
     // Confirmation mot de passe

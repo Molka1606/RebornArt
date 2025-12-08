@@ -1,72 +1,70 @@
-<?php
-require_once "../../controller/adminController.php";
-
-$message = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    $email = trim($_POST["email"]);
-    $controller = new adminController();
-
-    // Générer code seulement pour admin
-    $code = $controller->createAdminResetCode($email);
-
-    if (!$code) {
-        $message = "<span style='color:red;'>Email introuvable ou non administrateur.</span>";
-    } else {
-        $resetLink = "http://localhost/RebornArt/views/admin/adminResetPassword.php?code=" . $code;
-
-        // Pour XAMPP : pas d'email → afficher le lien
-        $message = "Voici votre lien de réinitialisation :<br><br>
-        <a href='$resetLink'>$resetLink</a>";
-    }
-}
-?>
-
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mot de passe Admin oublié</title>
-
-    <style>
-        <?php echo file_get_contents("../assets/css/admin.css"); ?>
-
-        .reset-msg {
-            background: #eef6f0;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin: 10px 0 20px;
-            font-size: 13px;
-            color: #345f41;
-            word-break: break-all;
-            max-width: 260px;
-        }
-    </style>
+    <title>Mot de passe oublié</title>
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
+
 <body class="body-profil">
 
-<div class="box">
-    <div class="form-box">
-        <form method="POST">
+    <div class="box">
+        <div class="form-box">
 
-            <?php if (!empty($message)) : ?>
-                <div class="reset-msg"><?php echo $message; ?></div>
-            <?php endif; ?>
+            <h1 class="htitre">Mot de passe oublié</h1>
 
-            <input type="email" name="email" placeholder="Votre email admin">
+            <input type="email" id="email" placeholder="Votre email admin">
 
-            <button type="submit">Envoyer le lien</button>
+            <span id="msg" style="color:red; font-size:15px;"></span>
 
-            <a href="adminLogin.php">← Retour</a>
-        </form>
-    </div>
+            <button onclick="sendCode()">Envoyer le code</button>
 
-    <div class="side-box">
-        <div class="side">
+        </div>
+                <div class="side-box">
+            <div class="side"></div>
         </div>
     </div>
-</div>
 
+    <script>
+        function sendCode() {
+            let email = document.getElementById("email").value;
+
+            if (email.trim() === "") {
+                document.getElementById("msg").innerText = "Veuillez entrer votre email.";
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("email", email);
+
+            fetch("../../controller/sendCode.php", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.text())
+            .then(data => {
+
+                if (data === "success") {
+                    document.getElementById("msg").style.color = "green";
+                    document.getElementById("msg").innerText =
+                        "Code envoyé ! Vérifiez votre email.";
+
+                    // Redirection vers vérification
+                    setTimeout(() => {
+                        window.location.href = "verifyCode.php";
+                    }, 1500);
+                }
+                else if (data === "no_email") {
+                    document.getElementById("msg").innerText =
+                        "Erreur : email non envoyé au serveur.";
+                }
+                else {
+                    document.getElementById("msg").innerText =
+                        "Erreur d'envoi : " + data;
+                }
+            });
+        }
+    </script>
 </body>
 </html>

@@ -163,47 +163,18 @@ public function desactiverAdmin($id) {
     return $stmt->execute([':id' => $id]);
 }
 
-public function createAdminResetCode($email) {
+public function updatePassword($email, $newPassword) {
     $db = config::getConnexion();
-
-    $stmt = $db->prepare("SELECT * FROM User WHERE email = :email AND role = 'admin'");
-    $stmt->execute([':email' => $email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$user) return false;
-
-    $code = rand(100000, 999999);
-
-    $update = $db->prepare("UPDATE User SET reset_code = :code WHERE email = :email");
-    $update->execute([
-        ':code' => $code,
-        ':email' => $email
-    ]);
-
-    return $code;
-}
-
-public function checkAdminResetCode($code) {
-    $db = config::getConnexion();
-
-    $stmt = $db->prepare("SELECT * FROM User WHERE reset_code = :code AND role = 'admin'");
-    $stmt->execute([':code' => $code]);
-
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-public function updateAdminPasswordFromCode($code, $newPassword) {
-    $db = config::getConnexion();
-
     $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
 
-    $stmt = $db->prepare("UPDATE User SET motdepasse = :mdp, reset_code = NULL 
-                         WHERE reset_code = :code AND role='admin'");
-    return $stmt->execute([
-        ':mdp' => $hashed,
-        ':code' => $code
-    ]);
+    $sql = "UPDATE User SET motdepasse = :motdepasse WHERE email = :email";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':motdepasse', $hashed);
+    $stmt->bindValue(':email', $email);
+
+    $stmt->execute();
 }
+
 
 }
 ?>
