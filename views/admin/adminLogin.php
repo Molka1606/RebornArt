@@ -9,7 +9,9 @@ $adminC = new adminController();
 if (isset($_SESSION['user']) && $_SESSION['user']['role'] !== 'admin') {
     echo "<script>
         alert('Un utilisateur est déjà connecté sur ce navigateur. Déconnectez-le d’abord.');
+        window.location.href='../../Utilisateur/indexx.php';
     </script>";
+    exit;
 }
 
 $loginError = '';
@@ -50,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="fr">

@@ -1,12 +1,73 @@
-
 <?php
 session_start();
-if(!isset($_SESSION['user'])){
+
+if (!isset($_SESSION['user'])) {
     header("Location: signIn.html");
     exit;
 }
 
 $user = $_SESSION['user']; 
+
+// ✅ CONNEXION BASE
+require_once __DIR__ . "/../model/config.php";
+$pdo = config::getConnexion();
+
+/* =====================================================
+   ✅ 1) STATISTIQUES UTILISATEURS PAR MOIS (SANS ADMINS)
+===================================================== */
+
+$sql = "
+SELECT MONTH(created_at) AS mois, COUNT(*) AS total
+FROM User
+WHERE role = 'user'
+GROUP BY MONTH(created_at)
+ORDER BY mois
+";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$statUsers = array_fill(0, 12, 0);
+
+foreach ($result as $row) {
+    $statUsers[$row['mois'] - 1] = $row['total'];
+}
+
+/* =====================================================
+   ✅ 2) UTILISATEURS ACTIFS / INACTIFS (SANS ADMINS)
+===================================================== */
+
+$sqlStatus = "
+SELECT status, COUNT(*) as total 
+FROM User 
+WHERE role = 'user'
+GROUP BY status
+";
+
+$stmtStatus = $pdo->prepare($sqlStatus);
+$stmtStatus->execute();
+$resultStatus = $stmtStatus->fetchAll(PDO::FETCH_ASSOC);
+
+$active = 0;
+$inactive = 0;
+
+foreach ($resultStatus as $row) {
+    if ($row['status'] === 'active') {
+        $active = $row['total'];
+    } elseif ($row['status'] === 'inactive') {
+        $inactive = $row['total'];
+    }
+}
+
+/* =====================================================
+   ✅ 3) POURCENTAGES AUTOMATIQUES
+===================================================== */
+
+$totalUsers = $active + $inactive;
+
+$percentActive = $totalUsers > 0 ? round(($active / $totalUsers) * 100) : 0;
+$percentInactive = $totalUsers > 0 ? round(($inactive / $totalUsers) * 100) : 0;
 ?>
 
 
@@ -20,6 +81,7 @@ $user = $_SESSION['user'];
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+
 
     <title>SB Admin 2 - Dashboard</title>
 
@@ -367,7 +429,7 @@ $user = $_SESSION['user'];
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+                        <h1 class="h3 mb-0 text-gray-800">Accueil</h1>
                         <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
                     </div>
@@ -469,7 +531,7 @@ $user = $_SESSION['user'];
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Earnings Overview</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Statistiques des Utilisateurs</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -487,54 +549,43 @@ $user = $_SESSION['user'];
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                    <div style="height: 320px;">
+                                        <canvas id="userChart"></canvas>
                                     </div>
+
+
+
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Dropdown Header:</div>
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Something else here</a>
+                            <!-- Pie Chart -->
+                            <div class="col-xl-4 col-lg-5">
+                                <div class="card shadow mb-4">
+
+                                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-primary">Utilisateurs Actifs / Inactifs</h6>
+                                    </div>
+
+                                    <div class="card-body">
+
+                                        <div class="chart-pie pt-4 pb-2" style="height:250px;">
+                                            <canvas id="userStatusChart"></canvas>
                                         </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-primary"></i> Direct
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Social
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-info"></i> Referral
-                                        </span>
+
+                                        <div class="mt-4 text-center small">
+                                            <span class="mr-2">
+                                                Actifs: <?= $active ?> (<?= $percentActive ?>%)
+                                            </span>
+                                            <span class="mr-2">
+                                                Inactifs: <?= $inactive ?> (<?= $percentInactive ?>%)
+                                            </span>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
                     </div>
 
                     <!-- Content Row -->
@@ -753,8 +804,71 @@ $user = $_SESSION['user'];
     <!-- Page level custom scripts -->
     <script src="assets/js/demo/chart-area-demo.js"></script>
     <script src="assets/js/demo/chart-pie-demo.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const dataUsers = <?= json_encode($statUsers) ?>;
+console.log("STAT USERS:", dataUsers); // DEBUG
+
+const canvas = document.getElementById("userChart");
+
+if (canvas) {
+    const ctx = canvas.getContext("2d");
+
+    new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            datasets: [{
+                label: "Statistiques des utilisateurs",
+                data: dataUsers,
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+}
+</script>
+
+
+<script>
+const ctxStatus = document.getElementById("userStatusChart").getContext("2d");
+
+new Chart(ctxStatus, {
+    type: "doughnut",
+    data: {
+        labels: ["Actifs", "Inactifs"],
+        datasets: [{
+            data: [<?= $active ?>, <?= $inactive ?>],
+            backgroundColor: ["#1cc88a", "#e74a3b"],
+            hoverBackgroundColor: ["#17a673", "#c0392b"],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+        }],
+    },
+    options: {
+        maintainAspectRatio: false,
+        cutout: "70%",
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    },
+});
+</script>
+
 
 </body>
 

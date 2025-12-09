@@ -11,18 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_SESSION['role'])) {
 
         // Si un ADMIN est connecté → blocage
-        if (isset($_SESSION['user']) && $_SESSION['user']['role'] !== 'user') {
+        if ($_SESSION['role'] === 'admin') {
             echo "<script>
-                alert('Un administrateur est déjà connecté. Déconnectez-vous d’abord.');
+                alert('Un administrateur est déjà connecté dans ce navigateur. Déconnectez-vous d’abord.');
+                window.location.href='signIn.html';
             </script>";
+            exit;
         }
-
 
         // Si un autre USER connecté → blocage
         if ($_SESSION['role'] === 'user') {
             echo "<script>
                 alert('Un utilisateur est déjà connecté dans ce navigateur.');
+                window.location.href='../indexx.php';
             </script>";
+            exit;
         }
     }
 
