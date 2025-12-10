@@ -56,16 +56,45 @@ try {
             break;
     }
 
-    $stmt = $db->prepare($query);
+// ================== ✅ PAGINATION ==================
+$items_per_page = 3;   // nombre d’utilisateurs par page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $items_per_page;
+
+// Compter le total
+$countQuery = "SELECT COUNT(*) FROM User WHERE role = :role";
+
+if ($search !== '') {
+    $countQuery .= " AND (nom LIKE :search OR prenom LIKE :search OR email LIKE :search)";
+}
+
+    $stmtCount = $db->prepare($countQuery);
 
     $params = ['role' => 'user'];
-
     if ($search !== '') {
         $params['search'] = "%$search%";
     }
 
-    $stmt->execute($params);
+    $stmtCount->execute($params);
+    $total_users = $stmtCount->fetchColumn();
+    $total_pages = ceil($total_users / $items_per_page);
+
+    // Ajouter la pagination à la requête principale
+    $query .= " LIMIT :offset, :limit";
+
+    $stmt = $db->prepare($query);
+    $stmt->bindValue(':role', 'user', PDO::PARAM_STR);
+
+    if ($search !== '') {
+        $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+    }
+
+    $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', (int)$items_per_page, PDO::PARAM_INT);
+
+    $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 } catch (Exception $e) {
     echo "Erreur : " . $e->getMessage();
@@ -288,10 +317,7 @@ try {
                         <form method="GET" action="" style="margin-bottom: 20px; display:flex; gap:10px;">
                             <input type="text" id="searchInput" name="search">
 
-                            <input type="text" name="search" placeholder="Recherche par nom/prénom/email"
-                                value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>"
-                                class="form-control" style="width:200px;">
-
+                        
                             <select name="sort" class="form-control" style="width:200px;">
                                 <option value="">Tri par défaut</option>
                                 <option value="name_asc"  <?= (isset($_GET['sort']) && $_GET['sort']=="name_asc") ? 'selected' : '' ?>>
@@ -334,6 +360,39 @@ try {
                             </tr>
                             <?php endforeach; ?>
                         </table>
+                        <!-- PAGINATION -->
+                        <nav aria-label="Page navigation" style="margin-top:20px;">
+                            <ul class="pagination justify-content-center">
+
+                                <!-- Bouton Précédent -->
+                                <li class="page-item <?= ($page <= 1) ? 'disabled' : '' ?>">
+                                    <a class="page-link"
+                                    href="?page=<?= $page - 1 ?>&search=<?= $search ?>&sort=<?= $sort ?>">
+                                        Précédent
+                                    </a>
+                                </li>
+
+                                <!-- Pages numérotées -->
+                                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                    <li class="page-item <?= ($i == $page) ? 'active' : '' ?>">
+                                        <a class="page-link"
+                                        href="?page=<?= $i ?>&search=<?= $search ?>&sort=<?= $sort ?>">
+                                            <?= $i ?>
+                                        </a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <!-- Bouton Suivant -->
+                                <li class="page-item <?= ($page >= $total_pages) ? 'disabled' : '' ?>">
+                                    <a class="page-link"
+                                    href="?page=<?= $page + 1 ?>&search=<?= $search ?>&sort=<?= $sort ?>">
+                                        Suivant
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+
                     </div>
                 </div>
 

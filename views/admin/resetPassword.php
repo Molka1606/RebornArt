@@ -51,7 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="box">
         <div class="form-box">
 
-            <h1 class="htitre">Réinitialiser le mot de passe</h1>
 
             <?php if ($successMsg): ?>
                 <p style="color:green;"><?php echo $successMsg; ?></p>

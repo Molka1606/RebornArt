@@ -15,11 +15,29 @@ $photo = isset($userSession['photo']) ? $userSession['photo'] : "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $nom = isset($_POST['nom']) ? $_POST['nom'] : $userSession['nom'];
-    $prenom = isset($_POST['prenom']) ? $_POST['prenom'] : $userSession['prenom'];
-    $email = isset($_POST['email']) ? $_POST['email'] : $userSession['email'];
+    // ✅ Sécurisation des champs
+    $nom = !empty($_POST['nom']) ? $_POST['nom'] : $userSession['nom'];
+    $prenom = !empty($_POST['prenom']) ? $_POST['prenom'] : $userSession['prenom'];
+    $email = !empty($_POST['email']) ? $_POST['email'] : $userSession['email'];
+    // ✅ Vérifier si email existe et ce n'est pas le mien
+    if ($controller->emailExists($email) && $email !== $userSession['email']) {
+        echo "<script>
+            alert('Cet email est déjà utilisé par un autre compte !');
+            window.location.href='infoo.php';
+        </script>";
+        exit;
+    }
 
-    // Upload photo
+    $telephone = !empty($_POST['telephone']) 
+        ? $_POST['telephone'] 
+        : (isset($userSession['telephone']) ? $userSession['telephone'] : null);
+
+    $date_naissance = !empty($_POST['date_naissance']) 
+        ? $_POST['date_naissance'] 
+        : (isset($userSession['date_naissance']) ? $userSession['date_naissance'] : null);
+
+
+    // ✅ Upload photo sécurisé
     if(isset($_FILES['profileImage']) && $_FILES['profileImage']['error'] === 0){
 
         $uploadDir = __DIR__ . '/../../uploads/';
@@ -36,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Création User corrigée
+    // ✅ Création de l'objet User AVEC telephone + date_naissance
     $updatedUser = new User(
         $userSession['id'],
         $nom,
@@ -44,11 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email,
         $userSession['motdepasse'],
         $userSession['role'],
-        $photo
+        $photo,
+        $telephone,
+        $date_naissance
     );
 
+    // ✅ Mise à jour en base
     $controller->updateUser($updatedUser);
 
+    // ✅ Mise à jour session COMPLÈTE
     $_SESSION['user'] = array(
         'id' => $updatedUser->getId(),
         'nom' => $updatedUser->getNom(),
@@ -56,7 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'email' => $updatedUser->getEmail(),
         'photo' => $updatedUser->getPhoto(),
         'role' => $updatedUser->getRole(),
-        'motdepasse' => $updatedUser->getMotdepasse()
+        'motdepasse' => $updatedUser->getMotdepasse(),
+        'telephone' => $telephone,
+        'date_naissance' => $date_naissance
     );
 
     header("Location: infoo.php");

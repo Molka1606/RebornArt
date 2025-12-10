@@ -78,22 +78,30 @@ function Adduser($User){
     /* ---------------------------------------------------------
         UPDATE USER
     --------------------------------------------------------- */
-    public function updateUser($user)
-    {
-        $db = config::getConnexion();
-        $sql = "UPDATE User 
-                SET nom = :nom, prenom = :prenom, email = :email, photo = :photo
+    public function updateUser($user) {
+        $sql = "UPDATE User SET 
+                    nom = :nom,
+                    prenom = :prenom,
+                    email = :email,
+                    photo = :photo,
+                    telephone = :telephone,
+                    date_naissance = :date_naissance
                 WHERE id = :id";
 
-        $stmt = $db->prepare($sql);
-        return $stmt->execute([
-            ':nom' => $user->getNom(),
-            ':prenom' => $user->getPrenom(),
-            ':email' => $user->getEmail(),
-            ':photo' => $user->getPhoto(),
-            ':id' => $user->getId()
-        ]);
+        $db = config::getConnexion();
+        $query = $db->prepare($sql);
+
+        $query->bindValue(':id', $user->getId());
+        $query->bindValue(':nom', $user->getNom());
+        $query->bindValue(':prenom', $user->getPrenom());
+        $query->bindValue(':email', $user->getEmail());
+        $query->bindValue(':photo', $user->getPhoto());
+        $query->bindValue(':telephone', $user->getTelephone());
+        $query->bindValue(':date_naissance', $user->getDateNaissance());
+
+        return $query->execute();
     }
+
 
     /* ---------------------------------------------------------
         GET USER BY ID

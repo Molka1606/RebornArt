@@ -123,6 +123,18 @@ if (isset($_SESSION['user'])) {
                     <label>Nouveau mot de passe</label>
                     <input type="password" name="new_password">
                 </div>
+                    <div class="col-md-6">
+                        <label>Téléphone</label>
+                        <input type="text" name="telephone" 
+                            value="<?php echo isset($user['telephone']) ? htmlspecialchars($user['telephone']) : ''; ?>">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Date de naissance</label>
+                        <input type="date" name="date_naissance" 
+                            value="<?php echo isset($user['date_naissance']) ? htmlspecialchars($user['date_naissance']) : ''; ?>">
+                    </div>
+
             </div>
 
             <button type="submit" class="btn-main mt-3">Modifier</button>
@@ -173,10 +185,10 @@ if (isset($_SESSION['user'])) {
     <div id="chatbot-messages"></div>
     <!-- ✅ Boutons rapides + Effacer -->
     <div id="chatbot-quick">
-      <button onclick="quickSend('Donne-moi une idée de recyclage')">♻️ Idée recyclage</button>
-      <button onclick="quickSend('Quels métiers propose RebornArt ?')">🛠️ Métiers</button>
-      <button onclick="quickSend('Comment gérer mon compte ?')">👤 Aide compte</button>
-      <button id="clear-history" class="clear-btn">🗑️ Effacer</button>
+      <button onclick="quickSend('Donne-moi une idée de recyclage')"> Idée recyclage</button>
+      <button onclick="quickSend('Quels métiers propose RebornArt ?')"> Métiers</button>
+      <button onclick="quickSend('Comment gérer mon compte ?')"> Aide compte</button>
+      <button id="clear-history" class="clear-btn">Effacer</button>
     </div>
 
     <!-- Messages -->

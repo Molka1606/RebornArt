@@ -48,13 +48,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         // Enregistrer session
         $_SESSION['user'] = [
-            'id' => $user['id'],
-            'nom' => $user['nom'],
-            'prenom' => $user['prenom'],
-            'email' => $user['email'],
-            'photo' => $user['photo'],
-            'role' => $user['role']
-        ];
+        'id' => $user['id'],
+        'nom' => $user['nom'],
+        'prenom' => $user['prenom'],
+        'email' => $user['email'],
+        'photo' => $user['photo'],
+        'role' => $user['role'],
+        'telephone' => $user['telephone'],          // ✅ AJOUT
+        'date_naissance' => $user['date_naissance'] // ✅ AJOUT
+    ];
+
         $_SESSION['role'] = 'user';
 
         echo "<script>

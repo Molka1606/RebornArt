@@ -1,5 +1,14 @@
 <?php
 session_start();
+// ✅ Blocage si un USER est déjà connecté
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'user') {
+    echo "<script>
+        alert('Un utilisateur est déjà connecté. Déconnectez-le d’abord.');
+        window.location.href='../admin/adminLogin.php';
+    </script>";
+    exit;
+}
+
 require_once __DIR__ . '/../../controller/adminController.php';
 
 // ✅ Instancier le controller
