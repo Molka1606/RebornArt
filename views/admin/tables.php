@@ -286,6 +286,7 @@ try {
                             <h3>Liste des utilisateurs</h3>
                         </div><!-- Formulaire de recherche / filtre / tri -->
                         <form method="GET" action="" style="margin-bottom: 20px; display:flex; gap:10px;">
+                            <input type="text" id="searchInput" name="search">
 
                             <input type="text" name="search" placeholder="Recherche par nom/prénom/email"
                                 value="<?= isset($_GET['search']) ? htmlspecialchars($_GET['search']) : '' ?>"
@@ -310,7 +311,8 @@ try {
                             <button class="btn btn-primary">Appliquer</button>
                         </form>
 
-                        <table>
+                        <table id="usersTable">
+
                             <tr>
                                 <th>Nom d'utilisateur</th>
                                 <th>Prénom d'utilisateur</th>
@@ -377,6 +379,25 @@ try {
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sb-admin-2.min.js"></script>
-    
+    <script>
+document.getElementById("searchInput").addEventListener("keyup", function () {
+    let value = this.value;
+
+    // Requête AJAX
+    fetch("?search=" + encodeURIComponent(value))
+        .then(response => response.text())
+        .then(data => {
+
+            // Extraire seulement le tableau depuis la page générée
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(data, "text/html");
+
+            let newTable = doc.querySelector("#usersTable");
+
+            document.querySelector("#usersTable").innerHTML = newTable.innerHTML;
+        });
+});
+</script>
+
 </body>
 </html>

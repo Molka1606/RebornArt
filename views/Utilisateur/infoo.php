@@ -48,6 +48,7 @@ if (isset($_SESSION['user'])) {
 <link rel="stylesheet" href="../assets/css/animated.css">
 <link rel="stylesheet" href="../assets/css/owl.css">
 <link rel="stylesheet" href="../assets/css/signup.css">
+
 </head>
 <body>
 
@@ -162,6 +163,35 @@ if (isset($_SESSION['user'])) {
         }
     });
 </script>
+<!-- ================= CHATBOT REBORNART ================= -->
+
+<!-- Bouton flottant -->
+<button id="chatbot-btn">💬</button>
+
+<!-- Fenêtre du chatbot -->
+<div id="chatbot-window" style="display:none; flex-direction:column;">
+    <div id="chatbot-messages"></div>
+    <!-- ✅ Boutons rapides + Effacer -->
+    <div id="chatbot-quick">
+      <button onclick="quickSend('Donne-moi une idée de recyclage')">♻️ Idée recyclage</button>
+      <button onclick="quickSend('Quels métiers propose RebornArt ?')">🛠️ Métiers</button>
+      <button onclick="quickSend('Comment gérer mon compte ?')">👤 Aide compte</button>
+      <button id="clear-history" class="clear-btn">🗑️ Effacer</button>
+    </div>
+
+    <!-- Messages -->
+    
+
+    <!-- Input -->
+    <div id="chatbot-input">
+        <input type="text" id="chatbot-text" placeholder="Écrire un message...">
+        <button id="chatbot-send">➤</button>
+        <button id="chatbot-voice">🎤</button>
+    </div>
+</div>
+<!-- CSS & JS du Chatbot -->
+<link rel="stylesheet" href="../assets/css/chatbot.css">
+<script src="../assets/js/chatbot.js"></script>
 
 </body>
 </html>
