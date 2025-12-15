@@ -363,31 +363,12 @@ body {
    RIGHT CARD
 =============================== */
 .right-card {
-    width: 1200px;             /* 🔥 plus large */
+  width: 1000px;
+    flex: 1;
     background: #fff;
-    padding: 70px;             /* 🔥 plus d'espace interne */
-    border-radius: 16px;       /* angles plus doux */
-    box-shadow: 0 0 28px rgba(0,0,0,0.10);
-    margin-left: 30px;
-}
-
-/* Agrandir les labels */
-.right-card label {
-    font-size: 18px;           /* 🔥 plus lisible */
-    font-weight: 600;
-}
-
-/* Agrandir les inputs */
-.right-card input {
-    height: 50px;              /* 🔥 plus grands */
-    font-size: 17px;           /* plus gros texte */
-    border-radius: 8px;
-}
-
-/* Bouton Modifier plus large */
-.right-card button {
-    padding: 14px 32px;
-    font-size: 18px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.06);
 }
 
 .right-card h2 {
@@ -578,4 +559,3 @@ input:focus {
     color: red;
     font-size: 14px;
 }
-

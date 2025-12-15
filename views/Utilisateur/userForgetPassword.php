@@ -14,7 +14,7 @@
 
             <h1 class="htitre">Mot de passe oublié</h1>
 
-            <input type="email" id="email" placeholder="Votre email admin">
+            <input type="email" id="email" placeholder="Votre email ">
 
             <span id="msg" style="color:red; font-size:15px;"></span>
 
