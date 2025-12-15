@@ -7,7 +7,7 @@ class config {
     {
       try {
         $server_name = "localhost";
-        $db_name = "rebornart_db";
+        $db_name = "rebornart";
         $db_user = "root";
         $db_pss = "";
         self::$pdo = new PDO("mysql:host=$server_name;dbname=$db_name",$db_user,$db_pss,
