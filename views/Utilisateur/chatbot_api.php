@@ -1,9 +1,16 @@
 <?php
+require_once __DIR__ . '/../../model/config.php';
+
 header("Content-Type: application/json");
 
-// ✅ TA VRAIE CLE API (celle qui commence par sk-)
+// 🔑 Clé API depuis .env
 $api_key = getenv('OPENAI_API_KEY');
-// Lire le message depuis le JS
+if (!$api_key) {
+    echo json_encode(["reply" => "Clé API OpenAI non chargée."]);
+    exit;
+}
+
+// 📩 Lire le message utilisateur
 $data = json_decode(file_get_contents("php://input"), true);
 $user_message = $data["message"] ?? "";
 
@@ -12,7 +19,7 @@ if (!$user_message) {
     exit;
 }
 
-// ✅ Nouvel endpoint OpenAI
+// 🌐 Appel API OpenAI (Responses API)
 $ch = curl_init("https://api.openai.com/v1/responses");
 
 curl_setopt_array($ch, [
@@ -23,15 +30,38 @@ curl_setopt_array($ch, [
         "Authorization: Bearer $api_key"
     ],
     CURLOPT_POSTFIELDS => json_encode([
-        "model" => "gpt-4.1-mini",
+        "model" => "gpt-4o-mini",
         "input" => [
             [
                 "role" => "system",
-                "content" => "Tu es RebornBot, l’assistant officiel du site RebornArt. Tu aides avec le recyclage créatif, les idées, les projets, les métiers et l’utilisation du site."
+                "content" => [
+                    [
+                        "type" => "input_text",
+                        "text" =>
+                        "Tu es RebornBot, l’assistant officiel du site RebornArt.
+
+                        TU DOIS RÉPONDRE UNIQUEMENT aux questions liées à :
+                        - RebornArt (le site)
+                        - le recyclage créatif
+                        - les métiers proposés sur RebornArt
+                        - les fonctionnalités du site
+                        - les projets, artisans, créations et utilisateurs
+
+                        RÈGLE STRICTE :
+                        Si la question n’est PAS liée à RebornArt ou au recyclage créatif,
+                        tu dois REFUSER poliment de répondre et dire EXACTEMENT :
+                        « Je réponds uniquement aux questions concernant RebornArt et le recyclage créatif. »"
+                    ]
+                ]
             ],
             [
                 "role" => "user",
-                "content" => $user_message
+                "content" => [
+                    [
+                        "type" => "input_text",
+                        "text" => $user_message
+                    ]
+                ]
             ]
         ]
     ])
@@ -51,27 +81,23 @@ curl_close($ch);
 
 $responseData = json_decode($response, true);
 
-// ✅ EXTRACTION CORRECTE DE LA RÉPONSE (version sûre 2025)
-$reply = null;
-
-// Cas 1 : output_text direct
-if (isset($responseData["output_text"])) {
-    $reply = $responseData["output_text"];
-}
-
-// Cas 2 : structure complexe
-elseif (isset($responseData["output"][0]["content"][0]["text"])) {
-    $reply = $responseData["output"][0]["content"][0]["text"];
-}
-
-if (!$reply) {
+// ❌ Erreur OpenAI explicite
+if (isset($responseData["error"])) {
     echo json_encode([
-        "reply" => "Erreur API OpenAI. Impossible de lire la réponse."
+        "reply" => "Erreur OpenAI : " . $responseData["error"]["message"]
     ]);
     exit;
 }
 
+// ✅ Extraction correcte de la réponse
+$reply = $responseData["output"][0]["content"][0]["text"] ?? null;
+
+if (!$reply) {
+    echo json_encode([
+        "reply" => "Erreur API OpenAI : réponse vide ou format inattendu."
+    ]);
+    exit;
+}
+
+// 📤 Réponse finale
 echo json_encode(["reply" => $reply]);
-
-
-

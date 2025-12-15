@@ -1,19 +1,23 @@
 <?php
+// ===================== CHARGEMENT DU .env (GLOBAL) =====================
+$envPath = __DIR__ . '/../.env';
+
+if (file_exists($envPath)) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue; // ignorer commentaires
+        if (!str_contains($line, '=')) continue;
+
+        list($key, $value) = explode('=', $line, 2);
+        putenv(trim($key) . '=' . trim($value));
+    }
+}
+// =====================================================================
 
 class config {
     private static $pdo = null;
 
     public static function getConnexion() {
-
-        // Charger le fichier .env s’il existe
-        if (file_exists(__DIR__ . '/../.env')) {
-            $lines = file(__DIR__ . '/../.env');
-            foreach ($lines as $line) {
-                if (trim($line) !== '' && strpos($line, '=') !== false) {
-                    putenv(trim($line));
-                }
-            }
-        }
 
         if (!isset(self::$pdo)) {
 
