@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 
 if (isset($_SESSION['user'])) {
     $nom = htmlspecialchars($_SESSION['user']['nom']);
@@ -7,7 +10,45 @@ if (isset($_SESSION['user'])) {
 } else {
     $nom = $prenom = null;
 }
+
+$notifCount = 0;
+
+if (isset($_SESSION['user']['id'])) {
+    require_once __DIR__ . '/../model/config.php';
+
+    $db = config::getConnexion();
+    $stmt = $db->prepare("
+        SELECT COUNT(*) 
+        FROM notifications 
+        WHERE id_user = :id_user AND is_read = 0
+    ");
+    $stmt->execute([
+        'id_user' => $_SESSION['user']['id']
+    ]);
+
+    $notifCount = $stmt->fetchColumn();
+    $notifications = [];
+
+if (isset($_SESSION['user']['id'])) {
+
+    // 🔔 notifications récentes (liste)
+    $stmt = $db->prepare("
+        SELECT * FROM notifications
+        WHERE id_user = :id_user
+        ORDER BY date_created DESC
+        LIMIT 5
+    ");
+    $stmt->execute([
+        'id_user' => $_SESSION['user']['id']
+    ]);
+
+    $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+}
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +105,7 @@ https://templatemo.com/tm-562-space-dynamic
         <div class="col-12">
           <nav class="main-nav">
             <!-- ***** Logo Start ***** -->
-            <a href="index.html" class="logo">
+            <a href="indexx.php" class="logo">
               <h4>Reborn<span>Art</span></h4>
             </a>
             <!-- ***** Logo End ***** -->
@@ -73,7 +114,36 @@ https://templatemo.com/tm-562-space-dynamic
               <li class="scroll-to-section"><a href="#top" class="active">Accueil</a></li>
               <li class="scroll-to-section"><a href="#about">A propos nous</a></li>
               <li class="scroll-to-section"><a href="#portfolio">Creations</a></li>
-              <li class="scroll-to-section"><a href="#blog">Blog</a></li> 
+              <li class="scroll-to-section"><a href="../views/view/front/articles.php">Blog</a></li> 
+              <li style="position: relative;">
+                  <a href="#" id="notifIcon" onclick="toggleNotif(); return false;">
+                      🔔
+                      <?php if ($notifCount > 0): ?>
+                          <span class="notif-badge"><?= $notifCount ?></span>
+                      <?php endif; ?>
+                  </a>
+
+                  <!-- 🔔 LISTE NOTIFICATIONS -->
+                  <div id="notifDropdown" class="notif-dropdown">
+                      <?php if (empty($notifications)): ?>
+                          <p class="notif-empty">Aucune notification</p>
+                      <?php endif; ?>
+
+                    <?php foreach ($notifications as $n): ?>
+                        <div class="notif-item <?= $n['is_read'] ? 'read' : '' ?>"
+                            onclick="window.location.href='../views/view/front/detailartc.php?id=<?= (int)$n['reference_id'] ?>'">
+                            
+                            <strong><?= htmlspecialchars($n['username']) ?></strong>
+                            <?= htmlspecialchars($n['message']) ?>
+                            <br>
+                            <small><?= $n['date_created'] ?></small>
+                        </div>
+                    <?php endforeach; ?>
+
+                  </div>
+              </li>
+
+
               <li class="main-red-button" id="userMenu">
               <?php if($nom && $prenom): ?>
                   <a href="#" onclick="return false;"><?php echo $nom . ' ' . $prenom; ?></a>
@@ -104,9 +174,10 @@ https://templatemo.com/tm-562-space-dynamic
           <div class="row">
             <div class="col-lg-6 align-self-center">
               <div class="left-content header-text wow fadeInLeft" data-wow-duration="1s" data-wow-delay="1s">
-                <h6>Welcome to RebornArt</h6>
-                <h2>We Turn <em>Waste</em> Into <span>Art</span></h2>
-                <p>Reborn Art gives a second life to recycled materials through creativity and design. We transform discarded objects into unique eco-friendly artworks that inspire change.</p>
+                <h6>Bienvenue chez RebornArt</h6>
+                <h2>Nous transformons les <em>déchets</em> en <span>art</span></h2>
+                <p>RebornArt donne une seconde vie aux matériaux recyclés à travers la créativité et le design. Nous transformons des objets abandonnés en œuvres uniques et écologiques qui inspirent le changement.</p>
+
 
                 <!-- <form id="search" action="#" method="GET">
                   <fieldset>
@@ -120,7 +191,7 @@ https://templatemo.com/tm-562-space-dynamic
             </div>
             <div class="col-lg-6">
               <div class="right-image wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.5s">
-                <img src="assets/images/banner-right-image.png" alt="team meeting">
+                <img src="assets/images/recycling.jpg" alt="team meeting">
               </div>
             </div>
           </div>
@@ -191,56 +262,15 @@ https://templatemo.com/tm-562-space-dynamic
     </div>
   </div>
 
-  <div id="services" class="our-services section">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 align-self-center  wow fadeInLeft" data-wow-duration="1s" data-wow-delay="0.2s">
-          <div class="left-image">
-            <img src="assets/images/services-left-image.png" alt="">
-          </div>
-        </div>
-        <div class="col-lg-6 wow fadeInRight" data-wow-duration="1s" data-wow-delay="0.2s">
-          <div class="section-heading">
-            <h2>Grow your website with our <em>SEO</em> service &amp; <span>Project</span> Ideas</h2>
-            <p>Space Dynamic HTML5 template is free to use for your website projects. However, you are not permitted to redistribute the template ZIP file on any CSS template collection websites. Please contact us for more information. Thank you for your kind cooperation.</p>
-          </div>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="first-bar progress-skill-bar">
-                <h4>Website Analysis</h4>
-                <span>84%</span>
-                <div class="filled-bar"></div>
-                <div class="full-bar"></div>
-              </div>
-            </div>
-            <div class="col-lg-12">
-              <div class="second-bar progress-skill-bar">
-                <h4>SEO Reports</h4>
-                <span>88%</span>
-                <div class="filled-bar"></div>
-                <div class="full-bar"></div>
-              </div>
-            </div>
-            <div class="col-lg-12">
-              <div class="third-bar progress-skill-bar">
-                <h4>Page Optimizations</h4>
-                <span>94%</span>
-                <div class="filled-bar"></div>
-                <div class="full-bar"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
 
   <div id="portfolio" class="our-portfolio section">
     <div class="container">
       <div class="row">
         <div class="col-lg-6 offset-lg-3">
           <div class="section-heading  wow bounceIn" data-wow-duration="1s" data-wow-delay="0.2s">
-            <h2>See Our Unique <em>Creations</em> &amp; What We <span>Provide</span></h2>
+            <h2>Découvrez nos <em>créations</em> uniques &amp; ce que nous <span>proposons</span></h2>
+
           </div>
         </div>
       </div>
@@ -301,118 +331,51 @@ https://templatemo.com/tm-562-space-dynamic
     </div>
   </div>
 
-  <div id="blog" class="our-blog section">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.25s">
-          <div class="section-heading">
-            <h2>Check Out What Is <em>Trending</em> In Our Latest <span>News</span></h2>
-          </div>
-        </div>
-        <div class="col-lg-6 wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.25s">
-          <div class="top-dec">
-            <img src="assets/images/blog-dec.png" alt="">
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.25s">
-          <div class="left-image">
-            <a href="#"><img src="assets/images/big-blog-thumb.jpg" alt="Workspace Desktop"></a>
-            <div class="info">
-              <div class="inner-content">
-                <ul>
-                  <li><i class="fa fa-calendar"></i> 24 Mar 2021</li>
-                  <li><i class="fa fa-users"></i> TemplateMo</li>
-                  <li><i class="fa fa-folder"></i> Branding</li>
-                </ul>
-                <a href="#"><h4>SEO Agency &amp; Digital Marketing</h4></a>
-                <p>Lorem ipsum dolor sit amet, consectetur and sed doer ket eismod tempor incididunt ut labore et dolore magna...</p>
-                <div class="main-blue-button">
-                  <a href="#">Discover More</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.25s">
-          <div class="right-list">
-            <ul>
-              <li>
-                <div class="left-content align-self-center">
-                  <span><i class="fa fa-calendar"></i> 18 Mar 2021</span>
-                  <a href="#"><h4>New Websites &amp; Backlinks</h4></a>
-                  <p>Lorem ipsum dolor sit amsecteturii and sed doer ket eismod...</p>
-                </div>
-                <div class="right-image">
-                  <a href="#"><img src="assets/images/blog-thumb-01.jpg" alt=""></a>
-                </div>
-              </li>
-              <li>
-                <div class="left-content align-self-center">
-                  <span><i class="fa fa-calendar"></i> 14 Mar 2021</span>
-                  <a href="#"><h4>SEO Analysis &amp; Content Ideas</h4></a>
-                  <p>Lorem ipsum dolor sit amsecteturii and sed doer ket eismod...</p>
-                </div>
-                <div class="right-image">
-                  <a href="#"><img src="assets/images/blog-thumb-01.jpg" alt=""></a>
-                </div>
-              </li>
-              <li>
-                <div class="left-content align-self-center">
-                  <span><i class="fa fa-calendar"></i> 06 Mar 2021</span>
-                  <a href="#"><h4>SEO Tips &amp; Digital Marketing</h4></a>
-                  <p>Lorem ipsum dolor sit amsecteturii and sed doer ket eismod...</p>
-                </div>
-                <div class="right-image">
-                  <a href="#"><img src="assets/images/blog-thumb-01.jpg" alt=""></a>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <div id="contact" class="contact-us section">
     <div class="container">
       <div class="row">
         <div class="col-lg-6 align-self-center wow fadeInLeft" data-wow-duration="0.5s" data-wow-delay="0.25s">
-          <div class="section-heading">
-            <h2>Feel Free To Send Us a Message About Your Website Needs</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doer ket eismod tempor incididunt ut labore et dolores</p>
-            <div class="phone-info">
-              <h4>For any enquiry, Call Us: <span><i class="fa fa-phone"></i> <a href="#">010-020-0340</a></span></h4>
-            </div>
-          </div>
+<div class="section-heading">
+  <h2>N’hésitez pas à nous contacter pour donner vie à vos idées créatives</h2>
+  <p>Vous avez une question, une collaboration à proposer ou un projet artistique à base de recyclage ? RebornArt est à votre écoute.</p>
+  <div class="phone-info">
+    <h4>Pour toute demande, contactez-nous :
+      <span>
+        <i class="fa fa-phone"></i>
+        <a href="#">+216 72 589 479</a>
+      </span>
+    </h4>
+  </div>
+</div>
+
         </div>
         <div class="col-lg-6 wow fadeInRight" data-wow-duration="0.5s" data-wow-delay="0.25s">
           <form id="contact" action="" method="post">
             <div class="row">
               <div class="col-lg-6">
                 <fieldset>
-                  <input type="name" name="name" id="name" placeholder="Name" autocomplete="on" required>
+                  <input type="name" name="name" id="name" placeholder="Nom" autocomplete="on" >
                 </fieldset>
               </div>
               <div class="col-lg-6">
                 <fieldset>
-                  <input type="surname" name="surname" id="surname" placeholder="Surname" autocomplete="on" required>
+                  <input type="surname" name="surname" id="surname" placeholder="Prénom" autocomplete="on" >
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
-                  <input type="text" name="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="Your Email" required="">
+                  <input type="text" name="email" id="email" pattern="[^ @]*@[^ @]*" placeholder="Votre Email" >
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
-                  <textarea name="message" type="text" class="form-control" id="message" placeholder="Message" required=""></textarea>  
+                  <textarea name="message" type="text" class="form-control" id="message" placeholder="Message" ></textarea>  
                 </fieldset>
               </div>
               <div class="col-lg-12">
                 <fieldset>
-                  <button type="submit" id="form-submit" class="main-button ">Send Message</button>
+                  <button type="submit" id="form-submit" class="main-button ">Envoyer Message</button>
                 </fieldset>
               </div>
             </div>
@@ -429,7 +392,7 @@ https://templatemo.com/tm-562-space-dynamic
     <div class="container">
       <div class="row">
         <div class="col-lg-12 wow fadeIn" data-wow-duration="1s" data-wow-delay="0.25s">
-          <p>© Copyright RebornArt 2025. All Rights Reserved. 
+          <p>2025 RebornArt - Tous droits réservés 
         </div>
       </div>
     </div>
@@ -442,6 +405,60 @@ https://templatemo.com/tm-562-space-dynamic
   <script src="assets/js/templatemo-custom.js"></script>
 
   <style>
+.notif-icon {
+    position: relative;
+    display: inline-block;
+    font-size: 18px;   /* taille cloche */
+}
+
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 14px;
+    height: 14px;
+    line-height: 14px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;   /* 🔥 taille du "1" */
+    font-weight: bold;
+    text-align: center;
+    padding: 0 3px;
+}
+
+.notif-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    width: 300px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.notif-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.notif-item:hover {
+    background: #f5f5f5;
+}
+
+.notif-item.read {
+    opacity: 0.6;
+}
+
+.notif-empty {
+    padding: 10px;
+    text-align: center;
+    color: gray;
+}
+
 #userMenu {
   position: relative;
   display: inline-block;
@@ -491,6 +508,21 @@ https://templatemo.com/tm-562-space-dynamic
 <!-- Chatbot Files -->
 <link rel="stylesheet" href="assets/css/chatbot.css">
 <script src="assets/js/chatbot.js"></script>
+<script>
+function toggleNotif() {
+    const box = document.getElementById('notifDropdown');
+    box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+}
+
+// fermer si clic ailleurs
+document.addEventListener('click', function(e) {
+    const notif = document.getElementById('notifDropdown');
+    const icon = document.getElementById('notifIcon');
+    if (!notif.contains(e.target) && !icon.contains(e.target)) {
+        notif.style.display = 'none';
+    }
+});
+</script>
 
 </body>
 </html>

@@ -23,8 +23,84 @@ if (isset($_SESSION['user'])) {
 } else {
     $userMenuContent = '<a href="views/Utilisateur/signIn.html">Se connecter</a>';
 }
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+require_once __DIR__ . '/../../model/config.php';
+require_once __DIR__ . '/../../model/notif.php';
+
+
+$notifications = [];
+$notifCount = 0;
+
+if (isset($_SESSION['user']['id'])) {
+    $db = config::getConnexion();
+    $notif = new Notif($db);
+
+    $notifications = $notif->getUnreadByUser($_SESSION['user']['id']);
+    $notifCount = count($notifications);
+}
 ?>
+
+
 <style>
+.notif-icon {
+    position: relative;
+    display: inline-block;
+    font-size: 18px;   /* taille cloche */
+}
+
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 14px;
+    height: 14px;
+    line-height: 14px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 10px;   /* 🔥 taille du "1" */
+    font-weight: bold;
+    text-align: center;
+    padding: 0 3px;
+}
+
+.notif-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    width: 300px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.notif-item {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+.notif-item:hover {
+    background: #f5f5f5;
+}
+
+.notif-item.read {
+    opacity: 0.6;
+}
+
+.notif-empty {
+    padding: 10px;
+    text-align: center;
+    color: gray;
+}
+
+
 #userMenu > a { display:inline-block; background-color:#28a745; color:white !important; padding:6px 12px; border-radius:6px; font-size:14px; font-weight:4500; text-decoration:none; transition:0.2s ease-in-out; }
 #userMenu > a:hover { background-color:#218838; }
 #userMenu .listee li { width:100%; }
@@ -55,13 +131,40 @@ if (isset($_SESSION['user'])) {
 <header class="header-area header-sticky wow slideInDown" data-wow-duration="0.75s" data-wow-delay="0s">
 <div class="container"><div class="row"><div class="col-12">
 <nav class="main-nav">
-<a href="indexx.php" class="logo"><h4>Reborn<span>Art</span></h4></a>
+<a href="../indexx.php" class="logo"><h4>Reborn<span>Art</span></h4></a>
 <ul class="nav">
 <li class="scroll-to-section"><a href="#top" class="active">Accueil</a></li>
 <li class="scroll-to-section"><a href="#about">A propos nous</a></li>
 <li class="scroll-to-section"><a href="#portfolio">Creations</a></li>
-<li class="scroll-to-section"><a href="#blog">Blog</a></li>
-<li class="scroll-to-section" id="userMenu"><?php echo $userMenuContent; ?></li>
+<li class="scroll-to-section"><a href="../view/front/articles.php">Blog</a></li>
+<li class="scroll-to-section notif-wrapper">
+    <a href="#" onclick="toggleNotif()" class="notif-icon">
+        🔔
+        <?php if (!empty($notifCount) && $notifCount > 0): ?>
+            <span class="notif-badge"><?= $notifCount ?></span>
+        <?php endif; ?>
+    </a>
+
+    <!-- Dropdown notifications -->
+    <div class="notif-dropdown" id="notifDropdown">
+        <?php if (empty($notifications)): ?>
+            <p class="notif-empty">Aucune notification</p>
+        <?php else: ?>
+            <?php foreach ($notifications as $n): ?>
+                <div class="notif-item <?= $n['is_read'] ? 'read' : '' ?>">
+                    <strong><?= htmlspecialchars($n['username']) ?></strong>
+                    <?= htmlspecialchars($n['message']) ?>
+                    <br>
+                    <small><?= $n['date_created'] ?></small>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</li>
+
+<li class="scroll-to-section" id="userMenu">
+    <?php echo $userMenuContent; ?>
+</li>
 </ul>
 </nav>
 </div></div></div>
@@ -146,7 +249,7 @@ if (isset($_SESSION['user'])) {
 <div class="container">
 <div class="row">
 <div class="col-lg-12 wow fadeIn" data-wow-duration="1s" data-wow-delay="0.25s">
-<p>Copyright RebornArt 2025. All Rights Reserved.</p>
+<p>2025 RebornArt - Tous droits réservés</p>
 </div>
 </div>
 </div>
@@ -204,6 +307,21 @@ if (isset($_SESSION['user'])) {
 <!-- CSS & JS du Chatbot -->
 <link rel="stylesheet" href="../assets/css/chatbot.css">
 <script src="../assets/js/chatbot.js"></script>
+<script>
+function toggleNotif() {
+    const box = document.getElementById('notifDropdown');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+// fermer si clic ailleurs
+document.addEventListener('click', function(e) {
+    const notif = document.getElementById('notifDropdown');
+    const icon = document.querySelector('.notif-icon');
+    if (notif && !notif.contains(e.target) && !icon.contains(e.target)) {
+        notif.style.display = 'none';
+    }
+});
+</script>
 
 </body>
 </html>

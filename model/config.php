@@ -1,37 +1,36 @@
 <?php
-// ===================== CHARGEMENT DU .env (GLOBAL) =====================
+
+/* ===== Chargement du fichier .env ===== */
 $envPath = __DIR__ . '/../.env';
 
 if (file_exists($envPath)) {
     $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue; // ignorer commentaires
+        if (strpos(trim($line), '#') === 0) continue;
         if (!str_contains($line, '=')) continue;
 
         list($key, $value) = explode('=', $line, 2);
         putenv(trim($key) . '=' . trim($value));
     }
 }
-// =====================================================================
 
+/* ===== Classe Config UNIQUE ===== */
 class config {
     private static $pdo = null;
 
     public static function getConnexion() {
-
         if (!isset(self::$pdo)) {
 
-            // Lire depuis .env
-            $servername = getenv('DB_HOST');
-            $dbname     = getenv('DB_NAME');
-            $username   = getenv('DB_USER');
-            $password   = getenv('DB_PASS');
+            $server_name = getenv('DB_HOST');
+            $db_name     = getenv('DB_NAME');
+            $db_user     = getenv('DB_USER');
+            $db_pass     = getenv('DB_PASS');
 
             try {
                 self::$pdo = new PDO(
-                    "mysql:host=$servername;dbname=$dbname",
-                    $username,
-                    $password,
+                    "mysql:host=$server_name;dbname=$db_name;charset=utf8",
+                    $db_user,
+                    $db_pass,
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
@@ -45,4 +44,3 @@ class config {
         return self::$pdo;
     }
 }
-?>
