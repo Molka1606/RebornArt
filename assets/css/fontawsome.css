@@ -1,0 +1,19 @@
+.fa {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+}
+
+.fa-calendar::before { content: "\f073"; }
+.fa-map-marker::before { content: "\f041"; }
+.fa-users::before { content: "\f0c0"; }
+.fa-folder::before { content: "\f07b"; }
+.fa-phone::before { content: "\f095"; }
+
+.fa {
+  margin-right: 5px;
+  font-size: 16px;
+  color: #008037;
+}

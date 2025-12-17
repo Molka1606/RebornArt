@@ -1,0 +1,27 @@
+# Email Configuration (contains sensitive credentials)
+config/email_config.php
+config/gmail_config.php
+config/credentials.json
+config/token.json
+config/auth_code.txt
+
+# Composer
+/vendor/
+composer.lock
+
+# Uploads
+/uploads/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+

@@ -1,0 +1,132 @@
+/* ------------------------------------------------------------------
+   GLOBAL RESET
+------------------------------------------------------------------ */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ------------------------------------------------------------------
+   HEADER
+------------------------------------------------------------------ */
+.logo {
+  text-align: center;
+  font-size: 42px;
+  margin-top: 25px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #008037;
+}
+.logo span {
+  color: #111;
+}
+
+/* ------------------------------------------------------------------
+   EVENTS SECTION (Home Page)
+------------------------------------------------------------------ */
+.events {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin: 40px auto;
+  padding: 20px;
+  flex-wrap: wrap;
+}
+
+.events img {
+  width: 300px;
+  height: 220px;
+  border-radius: 15px;
+  object-fit: cover;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+
+.events img:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 128, 55, 0.4);
+}
+
+/* ------------------------------------------------------------------
+   FORM STYLING (Home)
+------------------------------------------------------------------ */
+form {
+  width: 70%;
+  margin: 40px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 18px;
+  font-size: 16px;
+}
+
+form button {
+  width: 100%;
+  background-color: #008037;
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .3s ease;
+}
+
+form button:hover {
+  background-color: #00652b;
+}
+
+/* Admin Panel - Table */
+.table thead {
+  background: #008037;
+  color: white;
+}
+
+.admin-header {
+  background: #008037;
+  padding: 25px 0;
+  color: white;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.admin-header h2 {
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.card {
+  border-radius: 12px !important;
+}
+
+.btn-warning {
+  background: #f0ad4e !important;
+  color: white !important;
+}
+
+.btn-danger {
+  background: #d9534f !important;
+}
+
+footer {
+  background: #111;
+  color: #eee;
+  padding: 20px;
+  text-align: center;
+  margin-top: 40px;
+}

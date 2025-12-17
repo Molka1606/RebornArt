@@ -1,0 +1,38 @@
+.wow {
+  visibility: hidden;
+}
+
+.fadeIn {
+  animation-name: fadeIn;
+}
+.fadeInUp {
+  animation-name: fadeInUp;
+}
+.slideInDown {
+  animation-name: slideInDown;
+}
+.bounceInUp {
+  animation-name: bounceInUp;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; visibility: visible; }
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; visibility: visible; }
+}
+
+@keyframes slideInDown {
+  from { transform: translateY(-80px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; visibility: visible; }
+}
+
+@keyframes bounceInUp {
+  0% { opacity: 0; transform: translateY(100px); }
+  60% { opacity: 1; transform: translateY(-10px); }
+  80% { transform: translateY(5px); }
+  100% { transform: translateY(0); }
+}
