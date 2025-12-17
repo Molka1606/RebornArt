@@ -11,6 +11,7 @@ This module allows users to discover eco-friendly ideas, share feedback, and int
 Project Objectives
 
 The main objectives of this module are:
+
 	•	To manage blog posts related to creative recycling
 	•	To allow users to interact with content through comments
 	•	To provide like and dislike functionalities for blogs and comments
@@ -22,6 +23,7 @@ Implemented Features
 In this module, I implemented the following features:
 
 Blog Management
+
 	•	Create new blog posts
 	•	Edit existing blog posts
 	•	Delete blog posts
@@ -31,6 +33,7 @@ Blog Management
 	•	Sort blogs by most liked
 
 Comment Management
+
 	•	Add comments to blog posts
 	•	Edit comments
 	•	Delete comments
@@ -46,6 +49,7 @@ Interaction & Engagement
 Technologies Used
 
 The Blog & Comment module was developed using:
+
 	•	PHP with MVC architecture
 	•	MySQL database
 	•	HTML, CSS, and JavaScript
