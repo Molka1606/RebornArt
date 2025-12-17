@@ -8,8 +8,6 @@ RebornArt is a web platform dedicated to creative recycling and artistic reuse. 
 
 This module allows users to discover eco-friendly ideas, share feedback, and interact with content in a structured and moderated way.
 
-⸻
-
 Project Objectives
 
 The main objectives of this module are:
@@ -17,9 +15,7 @@ The main objectives of this module are:
 	•	To allow users to interact with content through comments
 	•	To provide like and dislike functionalities for blogs and comments
 	•	To ensure proper moderation and content management
-	•	To offer advanced content filtering and sorting
 
-⸻
 
 Implemented Features
 
@@ -47,8 +43,6 @@ Interaction & Engagement
 	•	Dynamic content updates using JavaScript
 	•	Secure actions based on user permissions
 
-⸻
-
 Technologies Used
 
 The Blog & Comment module was developed using:
@@ -58,7 +52,6 @@ The Blog & Comment module was developed using:
 	•	XAMPP (Apache and MySQL)
 	•	Git and GitHub for version control
 
-⸻
 
 Author
 
