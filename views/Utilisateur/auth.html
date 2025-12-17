@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Authentification</title>
+
+  <link rel="stylesheet" href="../assets/css/signup.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <script src="../assets/js/user.js"></script>
+</head>
+
+<body>
+
+<div class="container" id="container">
+
+  <!-- ✅ INSCRIPTION -->
+  <div class="form-container sign-up">
+    <form method="POST" action="Adduser.php">
+      <h1 class="htitre">Créer un compte</h1>
+
+      <input type="text" name="nom" id="nom" placeholder="Nom">
+      <span id="nomError" class="error"></span>
+
+      <input type="text" name="prenom" id="prenom" placeholder="Prénom">
+      <span id="prenomError" class="error"></span>
+
+      <input type="email" name="email" id="email" placeholder="Email">
+      <span id="emailError" class="error"></span>
+
+      <input type="password" name="motdepasse" id="motdepasse" placeholder="Mot de passe">
+      <span id="mdpError" class="error"></span>
+
+      <input type="password" name="cmotdepasse" id="cmotdepasse" placeholder="Confirmer le mot de passe">
+      <span id="cmdpError" class="error"></span>
+
+      <button type="submit" onclick="return validerInscription()">S'inscrire</button>
+    </form>
+  </div>
+
+  <!-- ✅ CONNEXION -->
+  <div class="form-container sign-in">
+    <form method="POST" action="login.php">
+      <h1 class="htitre">Se connecter</h1>
+
+      <input type="email" id="emailIn" name="email" placeholder="Email">
+      <span id="emailErrorIn" class="error"></span>
+
+      <input type="password" id="motdepasseIn" name="motdepasse" placeholder="Mot de passe">
+      <span id="mdpErrorIn" class="error"></span>
+
+      <a href="userForgetPassword.php">Mot de passe oublié ?</a>
+
+      <button type="submit" onclick="return validerConnexion()">Connexion</button>
+    </form>
+  </div>
+
+  <!-- ✅ PANNEAU SLIDER -->
+  <div class="toggle-container">
+    <div class="toggle">
+
+      <div class="toggle-panel toggle-left">
+        <h1>Déjà inscrit ?</h1>
+        <p>Connecte-toi à ton compte</p>
+        <button class="hidden" id="login">Connexion</button>
+      </div>
+
+      <div class="toggle-panel toggle-right">
+        <h1>Nouveau ici ?</h1>
+        <p>Crée ton compte maintenant</p>
+        <button class="hidden" id="register">Créer un compte</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ✅ SCRIPT TOGGLE -->
+<script>
+const container = document.getElementById('container');
+const registerBtn = document.getElementById('register');
+const loginBtn = document.getElementById('login');
+
+registerBtn.addEventListener('click', () => {
+    container.classList.add("active");
+});
+
+loginBtn.addEventListener('click', () => {
+    container.classList.remove("active");
+});
+</script>
+
+<script src="../assets/js/script.js"></script>
+
+</body>
+</html>

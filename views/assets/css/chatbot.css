@@ -1,0 +1,107 @@
+#chatbot-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background-color: #85c987;
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    font-size: 27px;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#chatbot-window {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    width:500px;
+    height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+#chatbot-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.chatbot-user {
+    text-align: right;
+    margin: 5px 0;
+    color: #000000;
+}
+
+.chatbot-bot {
+    text-align: left;
+    margin: 5px 0;
+    color: #000000;
+}
+
+#chatbot-input {
+    display: flex;
+    border-top: 1px solid #ccc;
+}
+
+#chatbot-input input {
+    flex: 1;
+    border: none;
+    padding: 10px;
+}
+
+#chatbot-input button {
+    background: #82b383;
+    color: white;
+    border: none;
+    padding: 10px;
+}
+#chatbot-quick {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
+}
+
+#chatbot-quick button {
+  background: #56a859;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+#chatbot-quick {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap; 
+  padding: 8px;
+}
+
+#chatbot-quick button {
+  background: #76ba78;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ✔️ Style du bouton effacer */
+.clear-btn {
+  background: #e74c3c !important;
+}
+
+.clear-btn:hover {
+  background: #c0392b !important;
+}

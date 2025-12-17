@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Créer un compte</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/signup.css">
+  <script src="../assets/js/user.js"></script>
+
+</head>
+
+<body>
+  <div class="box">
+    <div class="form-box">
+      <form method="POST" action="Adduser.php">
+        <h1 class="htitre">Créer un compte</h1>
+
+        <input type="text" name="nom" id="nom" placeholder="Nom">
+        <span id="nomError" class="error"></span>
+
+        <input type="text" name="prenom" id="prenom" placeholder="Prénom">
+        <span id="prenomError" class="error"></span>
+
+        <input type="email" name="email" id="email" placeholder="Email">
+        <span id="emailError" class="error"></span>
+
+        <input type="password" name="motdepasse" id="motdepasse" placeholder="Mot de passe">
+        <span id="mdpError" class="error"></span>
+
+        <input type="password" name="cmotdepasse" id="cmotdepasse" placeholder="Confirmer le mot de passe">
+        <span id="cmdpError" class="error"></span>
+
+        <button type="submit" onclick="return validerInscription()">S'inscrire</button>
+      </form>
+    </div>
+
+    <div class="side-box">
+      <button type="submit"><a href="signIn.html">Se connecter</a></button>
+    </div>
+  </div>
+
+  <script src="../assets/js/script.js"></script>
+</body>
+
+</html>
